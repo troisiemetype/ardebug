@@ -1,14 +1,20 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QCheckBox>
+#include <QDialog>
 #include <QInputDialog>
+#include <QLabel>
 #include <QMainWindow>
 #include <QSerialPort>
 #include <QString>
+#include <QStringList>
+#include <QWidget>
 
 #include <iostream>
 #include <vector>
 
+#include "dialog.h"
 #include "pair.h"
 #include "serialsettings.h"
 
@@ -26,6 +32,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    bool readPair();
+
 private slots:
 
     void readData();
@@ -36,12 +44,14 @@ private slots:
 
     void on_actionPort_settings_triggered();
 
+    void on_actionRemove_var_triggered();
+
 private:
     Ui::MainWindow *ui;
 
     QSerialPort *serial;
 
-    vector<Pair*> pairList;
+    vector<Pair*> varList;
 
 };
 

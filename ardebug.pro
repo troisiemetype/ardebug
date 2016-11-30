@@ -15,11 +15,14 @@ TEMPLATE = app
 SOURCES += main.cpp\
            mainwindow.cpp \
            serialsettings.cpp \
-    pair.cpp
+    pair.cpp \
+    dialog.cpp
 
 HEADERS  += mainwindow.h \
             serialsettings.h \
-    pair.h
+    pair.h \
+    dialog.h
 
 FORMS    += mainwindow.ui \
-            serialsettings.ui
+            serialsettings.ui \
+    dialog.ui
