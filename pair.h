@@ -1,6 +1,8 @@
 #ifndef PAIR_H
 #define PAIR_H
 
+#include <QGraphicsScene>
+#include <QGraphicsItem>
 #include <QGridLayout>
 #include <QLabel>
 #include <QLayout>
@@ -24,13 +26,17 @@ public:
 
     Pair(QGridLayout*, QString);
 
-    void update(int);
+    void update(int, int);
     void updateGui();
     void clear();
 
     void createWidget();
 
     QString getName();
+    int getValue();
+    QLine getCurve(int);
+
+    QPen getPenStyle();
 
 private:
 
@@ -45,7 +51,12 @@ private:
     int maxValue;
     vector<int> values;
 
+    int prevX;
+    int prevY;
+
     int valuesSize;
+
+    QPen *penStyle;
 
     QLabel *nameLabel;
     QLineEdit *valueLabel;
@@ -56,13 +67,15 @@ private:
     QPushButton *clearButton;
     QPushButton *optionButton;
 
-private slots:
+public slots:
 
     void on_pauseButton_clicked(bool);
 
-    void on_clearButton_pressed();
+    void on_clearButton_clicked();
 
-    void on_optionButton_pressed();
+protected slots:
+
+    void on_optionButton_clicked();
 
 };
 

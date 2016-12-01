@@ -9,20 +9,20 @@ Pair::Pair(QGridLayout *layout, QString _name)
 {
 //    parent = _parent;
     parentLayout = layout;
-    bool firstTime = true;
+    firstTime = true;
     pause = false;
     valuesSize = 255;
     name = _name;
+    penStyle = new QPen();
     createWidget();
     clear();
 }
 
 Pair::~Pair()
 {
-
 }
 
-void Pair::update(int val)
+void Pair::update(int val, int posX)
 {
     value = val;
 
@@ -30,6 +30,9 @@ void Pair::update(int val)
         firstTime = false;
         minValue = val;
         maxValue = val;
+        prevX = posX;
+        prevY = val;
+
     }
 
     if(val <= minValue){
@@ -57,6 +60,21 @@ void Pair::updateGui(){
     maxLabel->setText(QString::number(maxValue));
 }
 
+QLine Pair::getCurve(int posX)
+{
+    QLine line(prevX, prevY, posX, value);
+
+    prevX = posX;
+    prevY = value;
+
+    return line;
+}
+
+QPen Pair::getPenStyle()
+{
+    return *penStyle;
+}
+
 void Pair::clear()
 {
     firstTime = true;
@@ -75,7 +93,7 @@ void Pair::createWidget()
     minLabel = new QLineEdit(QString::number(minValue));
     maxLabel = new QLineEdit(QString::number(maxValue));
 
-    pauseButton = new QPushButton("Pause");
+    pauseButton = new QPushButton("pause");
     clearButton = new QPushButton("clear");
     optionButton = new QPushButton("options");
 
@@ -105,8 +123,8 @@ void Pair::createWidget()
     parentLayout->addWidget(optionButton, row, 6);
 
     QObject::connect(pauseButton, SIGNAL(clicked(bool)), this, SLOT(on_pauseButton_clicked(bool)));
-    QObject::connect(clearButton, SIGNAL(pressed()), this, SLOT(on_clearButton_pressed()));
-    QObject::connect(optionButton, SIGNAL(pressed()), this, SLOT(on_optionButton_pressed()));
+    QObject::connect(clearButton, SIGNAL(clicked()), this, SLOT(on_clearButton_clicked()));
+    QObject::connect(optionButton, SIGNAL(clicked()), this, SLOT(on_optionButton_clicked()));
 
 }
 
@@ -115,17 +133,23 @@ QString Pair::getName()
     return name;
 }
 
+int Pair::getValue()
+{
+    return value;
+}
+
 void Pair::on_pauseButton_clicked(bool checked)
 {
     pause = checked;
+    pauseButton->setChecked(checked);
 }
 
-void Pair::on_clearButton_pressed()
+void Pair::on_clearButton_clicked()
 {
     clear();
 }
 
-void Pair::on_optionButton_pressed()
+void Pair::on_optionButton_clicked()
 {
 
 }

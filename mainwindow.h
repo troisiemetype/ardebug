@@ -3,12 +3,15 @@
 
 #include <QCheckBox>
 #include <QDialog>
+#include <QGraphicsScene>
+#include <QGraphicsView>
 #include <QInputDialog>
 #include <QLabel>
 #include <QMainWindow>
 #include <QSerialPort>
 #include <QString>
 #include <QStringList>
+#include <QTimer>
 #include <QWidget>
 
 #include <iostream>
@@ -16,6 +19,7 @@
 
 #include "dialog.h"
 #include "pair.h"
+#include "suppresspair.h"
 #include "serialsettings.h"
 
 using namespace std;
@@ -46,12 +50,25 @@ private slots:
 
     void on_actionRemove_var_triggered();
 
+    void on_clearAllButton_clicked();
+
+    void on_pauseAllButton_clicked(bool checked);
+
+    void on_timer_timeout();
+
+    void on_actionShow_graph_triggered(bool checked);
+
 private:
     Ui::MainWindow *ui;
 
     QSerialPort *serial;
 
     vector<Pair*> varList;
+
+    QGraphicsScene *curvesScene;
+    QGraphicsView *curvesView;
+
+    int currentX;
 
 };
 

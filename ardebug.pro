@@ -16,13 +16,19 @@ SOURCES += main.cpp\
            mainwindow.cpp \
            serialsettings.cpp \
     pair.cpp \
-    dialog.cpp
+    suppresspair.cpp \
+    dialog.cpp \
+    varsettings.cpp
 
 HEADERS  += mainwindow.h \
             serialsettings.h \
     pair.h \
-    dialog.h
+    suppresspair.h \
+    dialog.h \
+    varsettings.h
 
 FORMS    += mainwindow.ui \
             serialsettings.ui \
-    dialog.ui
+    suppresspair.ui \
+    dialog.ui \
+    varsettings.ui
