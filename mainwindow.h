@@ -58,6 +58,10 @@ public:
 
     bool readPair();
 
+public slots:
+
+    void on_pair_delete(Pair*);
+
 private slots:
 
     void readData();
@@ -76,7 +80,7 @@ private slots:
 
     void on_timer_timeout();
 
-    void on_actionShow_graph_triggered(bool checked);
+    void on_actionAddGraph_triggered();
 
 private:
 

@@ -107,6 +107,11 @@ void VarSettings::setColor(int val)
     ui->colorComboBox->setCurrentIndex(plotColor);
 }
 
+bool VarSettings::getSuppress()
+{
+    return suppress;
+}
+
 void VarSettings::on_buttonBox_accepted()
 {
     if(ui->nameLineEdit->text() != ""){
@@ -116,6 +121,8 @@ void VarSettings::on_buttonBox_accepted()
     plotColor = ui->colorComboBox->currentIndex();
     plotStyle = ui->plotStyleComboBox->currentIndex();
     plotSize = ui->plotSizeSpinBox->value();
+
+    suppress = ui->suppressCheckBox->checkState();
 }
 
 void VarSettings::on_buttonBox_rejected()

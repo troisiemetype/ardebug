@@ -214,8 +214,25 @@ void MainWindow::on_timer_timeout()
     }
 }
 
-//Slot to display/hide th graphics
-void MainWindow::on_actionShow_graph_triggered(bool checked)
+//Slot to display/hide the graphics
+void MainWindow::on_actionAddGraph_triggered()
 {
-    curvesView->setVisible(checked);
+    curvesView->setVisible(true);
+}
+
+//Slot for deleting Pair
+void MainWindow::on_pair_delete(Pair* pair)
+{
+    int varNumber = varList.size();
+
+    for(int i = 0; i < varNumber; i++){
+        if(pair == varList.at(i))
+        {
+            curvesScene->removeItem(pathList.at(i));
+            varList.erase(varList.begin()+i);
+            pathList.erase(pathList.begin()+i);
+            delete pair;
+            return;
+        }
+    }
 }

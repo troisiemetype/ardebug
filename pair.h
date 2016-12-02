@@ -107,6 +107,10 @@ private:
     QPushButton *clearButton;
     QPushButton *optionButton;
 
+signals:
+
+    void on_delete(Pair*);
+
 public slots:
 
     void on_pauseButton_clicked(bool);

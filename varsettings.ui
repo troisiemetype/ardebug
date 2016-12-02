@@ -16,12 +16,25 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="nameLabel">
+       <property name="text">
+        <string>var name</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="nameLineEdit"/>
+     </item>
      <item row="1" column="0">
       <widget class="QLabel" name="varTypeLabel">
        <property name="text">
         <string>var type</string>
        </property>
       </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="varTypeComboBox"/>
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="plotColorLabel">
@@ -33,6 +46,9 @@
        </property>
       </widget>
      </item>
+     <item row="2" column="1">
+      <widget class="QComboBox" name="colorComboBox"/>
+     </item>
      <item row="3" column="0">
       <widget class="QLabel" name="plotStyleLabel">
        <property name="enabled">
@@ -42,9 +58,6 @@
         <string>plot style</string>
        </property>
       </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QComboBox" name="varTypeComboBox"/>
      </item>
      <item row="3" column="1">
       <widget class="QComboBox" name="plotStyleComboBox">
@@ -76,18 +89,12 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QComboBox" name="colorComboBox"/>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="nameLabel">
+     <item row="5" column="1">
+      <widget class="QCheckBox" name="suppressCheckBox">
        <property name="text">
-        <string>var name</string>
+        <string>suppress var</string>
        </property>
       </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="nameLineEdit"/>
      </item>
     </layout>
    </item>

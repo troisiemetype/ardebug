@@ -55,6 +55,8 @@ public:
     int getColor();
     void setColor(int);
 
+    bool getSuppress();
+
 
 private slots:
     void on_buttonBox_accepted();
@@ -73,6 +75,8 @@ private:
     int plotColor;
     int plotStyle;
     int plotSize;
+
+    bool suppress;
 
 };
 

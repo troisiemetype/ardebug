@@ -45,10 +45,20 @@ Pair::Pair(QWidget *_parent, QGridLayout *layout, QString _name)
     penStyle = new QPen();
     createWidget();
     clear();
+
+    connect(this, SIGNAL(on_delete(Pair*)), parent, SLOT(on_pair_delete(Pair*)));
 }
 
 Pair::~Pair()
 {
+    delete nameLabel;
+    delete valueLabel;
+    delete minLabel;
+    delete maxLabel;
+
+    delete pauseButton;
+    delete clearButton;
+    delete optionButton;
 
 }
 
@@ -59,6 +69,7 @@ void Pair::update(int val, int posX)
 
 
     if(firstTime == true){
+        curvePath->moveTo(posX, val);
         firstTime = false;
         minValue = val;
         maxValue = val;
@@ -224,6 +235,10 @@ void Pair::on_optionButton_clicked()
 
         nameLabel->setText(name);
         setPenStyle();
+
+        if(settings.getSuppress()){
+            emit on_delete(this);
+        }
     }
 }
 
