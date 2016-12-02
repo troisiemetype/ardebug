@@ -17,22 +17,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "suppresspair.h"
-#include "ui_suppresspair.h"
+#ifndef GRAPHVIEW_H
+#define GRAPHVIEW_H
 
-SuppressPair::SuppressPair(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::SuppressPair)
-{
-    ui->setupUi(this);
+#include <QCheckBox>
+#include <QGraphicsView>
+#include <QGraphicsScene>
+#include <QDialog>
+#include <QTimer>
+
+#include <vector>
+
+#include "pair.h"
+
+namespace Ui {
+class GraphView;
 }
 
-SuppressPair::~SuppressPair()
+class GraphView : public QDialog
 {
-    delete ui;
-}
+    Q_OBJECT
 
-void SuppressPair::addLine()
-{
+public:
+    explicit GraphView(QWidget *parent = 0, vector<Pair*> *pairs = 0);
+    ~GraphView();
 
-}
+public slots:
+    void update();
+
+private:
+    Ui::GraphView *ui;
+
+    QGraphicsScene *curvesScene;
+    QGraphicsView *curvesView;
+
+
+    vector<Pair*> *pairsList;
+
+
+};
+
+#endif // GRAPHVIEW_H

@@ -27,19 +27,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     move(50, 50);
 
-    currentX = 0;
+    timestamp = 0;
 
     serial = new QSerialPort(this);
-    QObject::connect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
-
-    curvesScene = new QGraphicsScene();
-    curvesScene->setSceneRect(0, 0, 500, 800);
-
-    curvesView = new QGraphicsView(curvesScene);
+    connect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(on_timer_timeout()));
-    timer->start(100);
+    timer->start(1);
 }
 
 MainWindow::~MainWindow()
@@ -53,23 +48,27 @@ bool MainWindow::readPair()
     //Get the serial data pending
     char *data = new char();
     serial->readLine(data, 64);
-    QString name = QString(data);
-
-    //trim the end of line chars added by Serial.println() on Arduino
-    name.remove(name.size()-2, 2);
+    QString name = getTrimString(data);
 
     //Verifies if the var received match a var that is watched
     for(int i = 0; i < varList.size(); i++){
         //if yes, update value
         if(name == varList.at(i)->getName()){
             serial->readLine(data, 64);
-            QString value = QString(data);
-            varList.at(i)->update(value.toInt(), currentX);
+            QString value = getTrimString(data);
+            varList.at(i)->update(value, timestamp);
             return true;
         }
     }
     return false;
 
+}
+
+//Trim the trailing chars \r \n added by Arduino Serial.prinln()
+QString MainWindow::getTrimString(char *data)
+{
+    QString name = QString(data);
+    return name.remove(name.size()-2, 2);
 }
 
 //Slot for data available
@@ -84,11 +83,16 @@ void MainWindow::readData()
 }
 
 //Slot for connecting serial
+//TODO: add Pair.clear() when open
 void MainWindow::on_actionConnect_triggered(bool checked)
 {
     if(checked){
         if(serial->open(QIODevice::ReadOnly))
         {
+            timestamp = 0;
+            for(int i = 0; i < varList.size(); i++){
+                varList.at(i)->clear();
+            }
         } else {
             ui->actionConnect->setChecked(false);
         }
@@ -107,52 +111,18 @@ void MainWindow::on_actionPort_settings_triggered()
 }
 
 //slot for adding a new var
-//TODO: add var type
+//TODO: use the var settings window instead
 void MainWindow::on_actionAdd_var_triggered()
 {
     bool ok = 0;
     //get a name for an input box
     QString name = QInputDialog::getText(this, "New var", "Var name", QLineEdit::Normal, QString(), &ok);
-    //Create a pair if name has benn set, and ok clicked
+    //Create a pair if name has been set, and ok clicked
     if(ok && !name.isEmpty()){
         Pair *pair = new Pair(this, ui->pairsLayout, name);
-        QGraphicsPathItem *path = curvesScene->addPath(pair->getPath());
         varList.push_back(pair);
-        pathList.push_back(path);
-//        QObject::connect(pair->clearButton, SIGNAL(pressed()), pair, SLOT(on_clearButton_pressed()));
+        pair->setIndex(varList.size());
     }
-}
-
-//slot for removing a var
-//TODO: everything. it doesn't work for now
-void MainWindow::on_actionRemove_var_triggered()
-{
-    int varNumber = varList.size();
-
-    if(varNumber == 0)
-    {
-        return;
-    }
-
-    Dialog varListDialog(this);
-
-    QWidget *widget = new QWidget;
-
-    QGridLayout *layout = new QGridLayout;
-
-    for(int i = 0; i < varNumber; i++){
-
-        QCheckBox *check = new QCheckBox();
-        layout->addWidget(check, i, 0);
-
-        QLabel *name = new QLabel(varList.at(i)->getName());
-        layout->addWidget(name, i, 1);
-    }
-
-    widget->setLayout(layout);
-
-    varListDialog.layout()->addWidget(widget);
-    varListDialog.exec();
 }
 
 //Slot to clear all the readings
@@ -187,40 +157,26 @@ void MainWindow::on_pauseAllButton_clicked(bool checked)
 
 }
 
-//slot for timer. Used by the Graphics View update
+//slot for timer: increment timestamp
 //TODO: create a class to handle graphics, put the timer in it
 void MainWindow::on_timer_timeout()
 {
-    int varNumber = varList.size();
-
     if(!serial->isOpen()){
         return;
     }
 
-    if(varNumber == 0)
-    {
-        return;
-    }
-
-    currentX += 2;
-
-    for(int i = 0; i < varNumber; i++){
-        varList.at(i)->updateCurve(currentX);
-        curvesScene->removeItem(pathList.at(i));
-        QGraphicsPathItem *path = curvesScene->addPath(varList.at(i)->getPath(),
-                                                       varList.at(i)->getPenStyle());
-        pathList.erase(pathList.begin()+i);
-        pathList.insert(pathList.begin()+i, path);
-    }
+    timestamp++;
 }
 
-//Slot to display/hide the graphics
+//Slot to display a new graphic window
 void MainWindow::on_actionAddGraph_triggered()
 {
-    curvesView->setVisible(true);
+    GraphView *graphView = new GraphView(this, &varList);
+    graphList.push_back(graphView);
+    graphView->show();
 }
 
-//Slot for deleting Pair
+//Slot for deleting Pair. Defined at Pair creation
 void MainWindow::on_pair_delete(Pair* pair)
 {
     int varNumber = varList.size();
@@ -228,11 +184,14 @@ void MainWindow::on_pair_delete(Pair* pair)
     for(int i = 0; i < varNumber; i++){
         if(pair == varList.at(i))
         {
-            curvesScene->removeItem(pathList.at(i));
             varList.erase(varList.begin()+i);
-            pathList.erase(pathList.begin()+i);
             delete pair;
             return;
         }
     }
+}
+
+void MainWindow::on_pair_update(Pair* pair)
+{
+
 }

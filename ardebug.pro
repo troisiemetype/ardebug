@@ -16,19 +16,19 @@ SOURCES += main.cpp\
            mainwindow.cpp \
            serialsettings.cpp \
     pair.cpp \
-    suppresspair.cpp \
     dialog.cpp \
-    varsettings.cpp
+    varsettings.cpp \
+    graphview.cpp
 
 HEADERS  += mainwindow.h \
             serialsettings.h \
     pair.h \
-    suppresspair.h \
     dialog.h \
-    varsettings.h
+    varsettings.h \
+    graphview.h
 
 FORMS    += mainwindow.ui \
             serialsettings.ui \
-    suppresspair.ui \
     dialog.ui \
-    varsettings.ui
+    varsettings.ui \
+    graphview.ui

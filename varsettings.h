@@ -27,6 +27,8 @@
 #include <QString>
 #include <QStringList>
 
+#include "pair.h"
+
 namespace Ui {
 class VarSettings;
 }

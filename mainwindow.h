@@ -38,8 +38,8 @@
 #include <vector>
 
 #include "dialog.h"
+#include "graphview.h"
 #include "pair.h"
-#include "suppresspair.h"
 #include "serialsettings.h"
 
 using namespace std;
@@ -58,9 +58,13 @@ public:
 
     bool readPair();
 
+    QString getTrimString(char*);
+
 public slots:
 
     void on_pair_delete(Pair*);
+
+    void on_pair_update(Pair*);
 
 private slots:
 
@@ -71,8 +75,6 @@ private slots:
     void on_actionAdd_var_triggered();
 
     void on_actionPort_settings_triggered();
-
-    void on_actionRemove_var_triggered();
 
     void on_clearAllButton_clicked();
 
@@ -86,15 +88,15 @@ private:
 
     Ui::MainWindow *ui;
 
+    //Pointer to the serial object
     QSerialPort *serial;
 
+    //Pointer table to the Pairs followed
     vector<Pair*> varList;
-    vector<QGraphicsPathItem*> pathList;
+    //Pointer table to the graphs created
+    vector<GraphView*> graphList;
 
-    QGraphicsScene *curvesScene;
-    QGraphicsView *curvesView;
-
-    int currentX;
+    int timestamp;
 
 };
 

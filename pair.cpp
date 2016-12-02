@@ -26,10 +26,12 @@ Pair::Pair()
 
 Pair::Pair(QWidget *_parent, QGridLayout *layout, QString _name)
 {
+    //init parents
     parent = _parent;
     parentLayout = layout;
 
-    type = 1;
+    //init plot style
+    type = 0;
     plotColor = 2;
     plotStyle = 1;
     plotSize = 1;
@@ -37,16 +39,24 @@ Pair::Pair(QWidget *_parent, QGridLayout *layout, QString _name)
 
 //    on_optionButton_clicked();
 
+    //Init state vars
+    value.val = "";
+    value.timestamp = 0;
+
     firstTime = true;
     pause = false;
     valuesSize = 255;
     name = _name;
-    curvePath = new QPainterPath();
-    penStyle = new QPen();
+
+    //Create the GUI widgets and init values
     createWidget();
     clear();
 
+    //Connect the delete signal with MainWindow
     connect(this, SIGNAL(on_delete(Pair*)), parent, SLOT(on_pair_delete(Pair*)));
+
+    //Connect the update signal with MainWindow
+    connect(this, SIGNAL(on_update(Pair*)), parent, SLOT(on_pair_update(Pair*)));
 }
 
 Pair::~Pair()
@@ -63,85 +73,61 @@ Pair::~Pair()
 }
 
 //Handle the update of the values. Called by the serial.readyRead() interrupt
-void Pair::update(int val, int posX)
+void Pair::update(QString val, int time)
 {
-    value = val;
+    value.val = val;
+    value.timestamp = time;
 
+    values.push_back(value);
 
-    if(firstTime == true){
-        curvePath->moveTo(posX, val);
-        firstTime = false;
-        minValue = val;
-        maxValue = val;
-        prevX = posX;
-        prevY = val;
+    if(type == TYPE_INT){
+        numValue = value.val.toInt();
+        if(firstTime == true){
+            firstTime = false;
+            minValue = numValue;
+            maxValue = numValue;
+        }
 
-    }
+        if(numValue <= minValue){
+            minValue = numValue;
+        }
 
-    if(val <= minValue){
-        minValue = val;
-    }
+        if(numValue >= maxValue){
+            maxValue = numValue;
+        }
 
-    if(val >= maxValue){
-        maxValue = val;
     }
 
     if(!pause){
         updateGui();
     }
-
-    values.push_back(val);
-
-    if(values.size() > valuesSize){
-        values.erase(values.begin());
-    }
 }
 
 //Update the GUI display values
 void Pair::updateGui(){
-    valueLabel->setText(QString::number(value));
-    minLabel->setText(QString::number(minValue));
-    maxLabel->setText(QString::number(maxValue));
-}
-
-//Update the curve path
-void Pair::updateCurve(int posX)
-{
-    curvePath->lineTo(posX, value);
-
-}
-
-//Get the curve path
-QPainterPath Pair::getPath()
-{
-    return *curvePath;
-}
-
-//Get the pen style
-QPen Pair::getPenStyle()
-{
-    return *penStyle;
-}
-
-//Set the pen style
-void Pair::setPenStyle()
-{
-    color = Qt::GlobalColor(plotColor);
-    penStyle->setColor(color);
-    penStyle->setStyle(Qt::PenStyle(plotStyle));
-    penStyle->setWidth(plotSize);
-    penStyle->setCapStyle(Qt::RoundCap);
-    penStyle->setJoinStyle(Qt::RoundJoin);
+    valueLabel->setText(value.val);
+    if(type != TYPE_STRING){
+        minLabel->setText(QString::number(minValue));
+        maxLabel->setText(QString::number(maxValue));
+    }
 }
 
 //Init the values
 void Pair::clear()
 {
     firstTime = true;
-    value = 0;
+    value.val = "";
     minValue = 0;
     maxValue = 0;
     values.clear();
+
+    if(type == TYPE_STRING){
+        minLabel->hide();
+        maxLabel->hide();
+    } else {
+        minLabel->show();
+        maxLabel->show();
+    }
 
     updateGui();
 }
@@ -150,9 +136,9 @@ void Pair::clear()
 void Pair::createWidget()
 {
     nameLabel = new QLabel(name);
-    valueLabel = new QLineEdit(QString::number(value));
-    minLabel = new QLineEdit(QString::number(minValue));
-    maxLabel = new QLineEdit(QString::number(maxValue));
+    valueLabel = new QLineEdit("");
+    minLabel = new QLineEdit("");
+    maxLabel = new QLineEdit("");
 
     pauseButton = new QPushButton("pause");
     clearButton = new QPushButton("clear");
@@ -195,11 +181,16 @@ QString Pair::getName()
     return name;
 }
 
-//Get the last value
-int Pair::getValue()
+int Pair::getIndex()
 {
-    return value;
+    return index;
 }
+
+void Pair::setIndex(int id)
+{
+    index = id;
+}
+
 
 //Slot for the pause button
 void Pair::on_pauseButton_clicked(bool checked)
@@ -228,18 +219,52 @@ void Pair::on_optionButton_clicked()
     if(settings.exec())
     {
         name = settings.getName();
-        type = settings.getVarType();
         plotColor = settings.getColor();
         plotSize = settings.getPlotSize();
         plotStyle = settings.getPlotStyle();
 
+        if(type != settings.getVarType()){
+            type = settings.getVarType();
+            clear();
+        }
+
         nameLabel->setText(name);
-        setPenStyle();
 
         if(settings.getSuppress()){
             emit on_delete(this);
         }
+        emit on_update(this);
     }
 }
 
+/*
+//Update the curve path
+void Pair::updateCurve(int posX)
+{
+    curvePath->lineTo(posX, value);
 
+}
+
+//Get the curve path
+QPainterPath Pair::getPath()
+{
+    return *curvePath;
+}
+
+//Get the pen style
+QPen Pair::getPenStyle()
+{
+    return *penStyle;
+}
+
+//Set the pen style
+void Pair::setPenStyle()
+{
+    color = Qt::GlobalColor(plotColor);
+    penStyle->setColor(color);
+    penStyle->setStyle(Qt::PenStyle(plotStyle));
+    penStyle->setWidth(plotSize);
+    penStyle->setCapStyle(Qt::RoundCap);
+    penStyle->setJoinStyle(Qt::RoundJoin);
+}
+*/

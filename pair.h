@@ -54,50 +54,63 @@ public:
 
     Pair(QWidget*, QGridLayout*, QString);
 
-    void update(int, int);
+    void update(QString, int);
     void updateGui();
     void clear();
 
     void createWidget();
 
+    void setIndex(int);
+    int getIndex();
+
+    void setName(QString);
     QString getName();
-    int getValue();
-    void updateCurve(int);
-    QPainterPath getPath();
-
-    QPen getPenStyle();
-
-    void setPenStyle();
 
 private:
-
+    //Parents
     QWidget *parent;
     QGridLayout *parentLayout;
 
+    //Operation vars
     bool firstTime;
     bool pause;
     QString name;
+    int index;
 
+    //Data struct
+    struct data_struct{
+        QString val;
+        int timestamp;
+    };
+
+    //Data table
+    vector<data_struct> values;
+
+    //Size of data taebl
+    int valuesSize;
+
+    //Graph parameters
     int type;
     int plotColor;
     int plotStyle;
     int plotSize;
 
-    int value;
+
+    //last value received
+    data_struct value;
+
+    //Numerical values
+    int numValue;
     int minValue;
     int maxValue;
-    vector<int> values;
 
-    int prevX;
-    int prevY;
-
-    int valuesSize;
-
+    //Path, pen style and color
+    //TODO: move from Pair to GraphView
     QPainterPath *curvePath;
-
     QPen *penStyle;
     QColor color;
 
+    //GUI display widget pointers
     QLabel *nameLabel;
     QLineEdit *valueLabel;
     QLineEdit *minLabel;
@@ -109,10 +122,14 @@ private:
 
 signals:
 
+    //custom signal to propagate Pair delete to MainWindow
     void on_delete(Pair*);
+
+    void on_update(Pair*);
 
 public slots:
 
+    //Slots for GUI buttons.
     void on_pauseButton_clicked(bool);
 
     void on_clearButton_clicked();
